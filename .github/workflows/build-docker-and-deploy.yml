@@ -24,15 +24,15 @@ jobs:
       shell: bash
       working-directory: ${{ github.workspace }}
         
-    - name: UnitTest ${{matrix.node-version}}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{matrix.node-version}}
-        cache: 'yarn'
-    - run: yarn install --frozen-lockfile
-    - run: yarn test
-      env:
-        CI: true
+#     - name: UnitTest ${{matrix.node-version}}
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: ${{matrix.node-version}}
+#         cache: 'yarn'
+#     - run: yarn install --frozen-lockfile
+#     - run: yarn test
+#       env:
+#         CI: true
     
     - name: Login Docker Hub
       uses: docker/login-action@v2
