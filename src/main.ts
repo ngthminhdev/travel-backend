@@ -14,34 +14,14 @@ async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create<NestExpressApplication>(AppModule, {
     bodyParser: true,
   });
-  // app.enableCors({
-  //   origin: [], // add your IP whitelist here
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  //   preflightContinue: false,
-  //   optionsSuccessStatus: 204,
-  //   credentials: true,
-  //   allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
-  // });
 
+  app.enable('trust proxy');
   app.enableCors({origin: '*'})
+  app.setGlobalPrefix(process.env.API_PREFIX);
+  app.set('trust proxy', true);
 
   app.use(cookieParser());
-  app.setGlobalPrefix(process.env.API_PREFIX);
   app.useGlobalInterceptors(new HttpLogger());
-
-  const config: Omit<OpenAPIObject, "paths"> = new DocumentBuilder()
-    .addBearerAuth()
-    .setTitle('Travel Swagger')
-    .setDescription('Author: Đăng Kim Liên')
-    .setContact('Đặng Kim Liên','https://www.facebook.com/dangkimlienn', 'kimlienc15@gmail.com')
-    .setVersion('1.0')
-    .build();
-
-  const document: OpenAPIObject = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, {
-    customSiteTitle: 'Travel Swagger',
-  });
-
   app.useGlobalFilters(new ValidationFilter());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -54,12 +34,27 @@ async function bootstrap() {
       },
     }),
   );
-
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  const config: Omit<OpenAPIObject, "paths"> = new DocumentBuilder()
+    .addBearerAuth()
+    .addCookieAuth()
+    .setTitle('Travel Swagger')
+    .setDescription('Author: Đăng Kim Liên')
+    .setContact('Đặng Kim Liên','https://www.facebook.com/dangkimlienn', 'kimlienc15@gmail.com')
+    .setVersion('1.0')
+    .build();
+
+  const document: OpenAPIObject = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document, {
+    customSiteTitle: 'Travel Swagger',
+  });
+
+
 
   await app.listen(parseInt(process.env.SERVER_PORT)).then((): void => {
     console.log(
-      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.01`,
+      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.02`,
     );
   });
 }

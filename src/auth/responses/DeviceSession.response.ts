@@ -13,12 +13,6 @@ export class DeviceSessionResponse {
     @ApiResponseProperty({
         type: String,
     })
-    mac_id: string;
-
-
-    @ApiResponseProperty({
-        type: String,
-    })
     user_agent: string;
 
     @ApiResponseProperty({
@@ -43,7 +37,6 @@ export class DeviceSessionResponse {
 
     constructor(data?: DeviceEntity) {
         this.device_id = data?.device_id || "";
-        this.mac_id = data?.mac_id || "";
         this.user_agent = data?.user_agent || "";
         this.ip_address = data?.ip_address || "";
         this.refresh_token = data?.refresh_token || "";
