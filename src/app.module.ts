@@ -6,7 +6,7 @@ import { ConfigServiceProvider } from "./config-module/config-module.service";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
-import { MacMiddleware } from "./middlewares/mac.middleware";
+import { RealIpMiddleware } from "./middlewares/real-ip.middleware";
 
 @Module({
   imports: [
@@ -40,13 +40,13 @@ import { MacMiddleware } from "./middlewares/mac.middleware";
 
     //application
     AuthModule,
-    UserModule
+    UserModule,
   ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
-      .apply(MacMiddleware)
+      .apply(RealIpMiddleware)
       .forRoutes("*");
   }
 }

@@ -14,12 +14,6 @@ export class DeviceEntity extends BaseModel {
         type: 'text',
         default: '',
     })
-    mac_id: string;
-
-    @Column({
-        type: 'text',
-        default: '',
-    })
     device_id: string;
 
     @Column({

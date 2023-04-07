@@ -80,10 +80,9 @@ export class AuthService {
       throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "account_name or password is not correct");
     }
 
-    // Lấy thông tin MAC ID, Device ID, địa chỉ IP và User Agent
-    const macId: string = req.mac;
+    // Lấy thông tin Device ID, địa chỉ IP và User Agent
     const deviceId: string = req.deviceId;
-    const ipAddress: string = req.socket.remoteAddress;
+    const ipAddress: string = req.realIP || req.ip || req.socket.remoteAddress;
     const userAgent: string = headers["user-agent"];
 
     // Xử lý phiên đăng nhập của thiết bị
@@ -91,7 +90,7 @@ export class AuthService {
       accessToken,
       refreshToken,
       expiredAt
-    } = await this.handleDeviceSession(user, macId, deviceId, ipAddress, userAgent);
+    } = await this.handleDeviceSession(user, deviceId, ipAddress, userAgent);
 
     // Lưu cookie refreshToken
     res.cookie("refreshToken", refreshToken, {
@@ -107,7 +106,7 @@ export class AuthService {
     });
   }
 
-  async handleDeviceSession(user: UserEntity, macId: string, deviceId: string, ipAddress: string, userAgent: string): Promise<DeviceLoginInterface> {
+  async handleDeviceSession(user: UserEntity, deviceId: string, ipAddress: string, userAgent: string): Promise<DeviceLoginInterface> {
     // Tìm kiếm thiết bị hiện tại theo device_id
     const currentDevice = await this.deviceRepo.findOne({ where: { device_id: deviceId } });
 
@@ -123,7 +122,6 @@ export class AuthService {
     const newDevice = await this.deviceRepo.save({
       id: currentDevice?.id || randomUUID(),
       user: user,
-      mac_id: macId,
       device_id: deviceId,
       user_agent: userAgent,
       expired_at: expiredAt,
