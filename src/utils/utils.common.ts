@@ -1,5 +1,6 @@
 import { ValidationError } from '@nestjs/common';
 import * as moment from 'moment';
+import crypto from "crypto";
 export class UtilCommonTemplate {
   static toDateTime(value?: any): Date | string {
     if (!value) {
@@ -34,15 +35,15 @@ export class UtilCommonTemplate {
 
   static uuid(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
+      const r = crypto.randomBytes(1).readUInt8(0);
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
 
-  static generateDeviceId(mac: string, userAgent: string) {
+  static generateDeviceId(userAgent: string, ip: string): string {
     // Chuyển đổi chuỗi thành mảng byte
-    const arr1 = mac.split(':').map(x => parseInt(x, 16));
+    const arr1 = ip.split(':').map(x => parseInt(x, 16));
     const arr2 = new TextEncoder().encode(userAgent);
 
     // Tạo một ArrayBuffer có kích thước đủ để chứa cả hai mảng byte
@@ -57,8 +58,7 @@ export class UtilCommonTemplate {
     const uuidBytes = new Uint8Array(buffer);
     uuidBytes[6] = (uuidBytes[6] & 0x0f) | 0x40;  // version 4
     uuidBytes[8] = (uuidBytes[8] & 0x3f) | 0x80;  // variant 1
-    const uuid = Array.from(uuidBytes).map(x => x.toString(16).padStart(2, '0')).join('');
-    return uuid.slice(0, 25)
+    return Array.from(uuidBytes).map(x => x.toString(16).padStart(2, '0')).join('');
   }
 
 }
