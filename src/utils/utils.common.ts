@@ -1,6 +1,6 @@
 import { ValidationError } from '@nestjs/common';
 import * as moment from 'moment';
-import crypto from "crypto";
+import * as crypto from "crypto";
 export class UtilCommonTemplate {
   static toDateTime(value?: any): Date | string {
     if (!value) {
