@@ -7,6 +7,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { RealIpMiddleware } from "./middlewares/real-ip.middleware";
+import { AhpModule } from './ahp/ahp.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RealIpMiddleware } from "./middlewares/real-ip.middleware";
     //application
     AuthModule,
     UserModule,
+    AhpModule,
   ]
 })
 export class AppModule implements NestModule {
