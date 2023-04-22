@@ -7,7 +7,7 @@ import { ExceptionResponse } from "./exceptions/common.exception";
 import { UtilCommonTemplate } from "./utils/utils.common";
 import { ValidationFilter } from "./filters/validation.filter";
 import * as cookieParser from 'cookie-parser';
-import { HttpLogger } from "./interceptors/http-logger";
+import { HttpLoggerInterceptor } from "./interceptors/http-logger.interceptor";
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
@@ -21,7 +21,7 @@ async function bootstrap() {
   app.set('trust proxy', true);
 
   app.use(cookieParser());
-  app.useGlobalInterceptors(new HttpLogger());
+  app.useGlobalInterceptors(new HttpLoggerInterceptor());
   app.useGlobalFilters(new ValidationFilter());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -54,7 +54,7 @@ async function bootstrap() {
 
   await app.listen(parseInt(process.env.SERVER_PORT)).then((): void => {
     console.log(
-      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.05`,
+      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.06`,
     );
   });
 }
