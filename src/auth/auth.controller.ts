@@ -43,7 +43,7 @@ export class AuthController {
     async register(@Body() body: RegisterDto, @Res() res: Response) {
         try {
             const data: RegisterResponse = await this.authService.register(body);
-            return res.status(HttpStatus.CREATED).send(new BaseResponse({ data }));
+            return res.status(HttpStatus.CREATED).send(new BaseResponse({ data, message: "register successfully" }));
         } catch (e) {
             throw new CatchException(e)
         }

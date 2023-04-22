@@ -75,6 +75,7 @@ export class AuthService {
     const hash: string = await bcrypt.hash(data.password, saltOrRounds);
     const newUser: UserEntity = await this.userRepo.save({
       ...data,
+      account_name: data.accountName,
       password: hash
     });
     // Gửi một OTP đến người dùng mới đăng ký
@@ -88,15 +89,15 @@ export class AuthService {
   }
 
   async login(req: MRequest, loginDto: LoginDto, headers: Headers, res: Response): Promise<UserResponse> {
-    const { account_name, password } = loginDto;
-    const user: UserEntity = await this.userRepo.findOne({ where: { account_name } });
+    const { accountName, password } = loginDto;
+    const user: UserEntity = await this.userRepo.findOne({ where: { account_name: accountName } });
     if (!user) {
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "account_name is not registered");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "accountName is not registered");
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "account_name or password is not correct");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "accountName or password is not correct");
     }
 
     // Lấy thông tin Device ID, địa chỉ IP và User Agent

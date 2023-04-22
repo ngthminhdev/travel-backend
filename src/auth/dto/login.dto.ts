@@ -7,7 +7,7 @@ export class LoginDto {
     type: String,
     example: 'tentaikhoan',
   })
-  account_name: string;
+  accountName: string;
 
   @IsString({message: 'password not found'})
   @ApiProperty({

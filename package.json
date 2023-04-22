@@ -1,6 +1,6 @@
 {
   "name": "travel-backend",
-  "version": "0.0.07",
+  "version": "0.0.08",
   "description": "Booking and Traveling website using NestJS, PostgreSQL, and Redis",
   "author": "Minh Nguyen",
   "private": true,

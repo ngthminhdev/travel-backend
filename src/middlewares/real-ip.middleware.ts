@@ -8,7 +8,6 @@ export class RealIpMiddleware implements NestMiddleware {
     async use(req: MRequest, res: Response, next: NextFunction) {
         const userAgent: string = req.headers["user-agent"];
         const realIp: any = req.headers["x-real-ip"] || req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-        console.log({ realIp });
         req.deviceId = UtilCommonTemplate.generateDeviceId(userAgent, realIp);
         req.realIP = realIp;
         next();
