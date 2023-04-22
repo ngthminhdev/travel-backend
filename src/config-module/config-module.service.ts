@@ -3,6 +3,7 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { redisStore } from "cache-manager-redis-store";
 import { TimeToLive } from "../enums/common.enum";
 import { JwtModuleOptions } from "@nestjs/jwt";
+import { BullModuleOptions } from "@nestjs/bull";
 
 @Injectable()
 export class ConfigServiceProvider {
@@ -31,6 +32,21 @@ export class ConfigServiceProvider {
         ttl: TimeToLive.FiveMinutes
       })
     };
+  }
+
+  createBullOptions(): BullModuleOptions {
+    return {
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB),
+      },
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    }
   }
 
   createUnitTestDBOptions(): TypeOrmModuleOptions {

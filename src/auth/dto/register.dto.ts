@@ -3,13 +3,13 @@ import { IsEmail, IsPhoneNumber, IsString, Matches, Validate, ValidateIf } from 
 import {PasswordMatchValidator} from "../../validators/password-match.validator";
 
 export class RegisterDto {
-    @IsString({message: 'account_name not found'})
-    @Matches(/^\w+$/u, {message: 'account_name is not valid'})
+    @IsString({message: 'accountName not found'})
+    @Matches(/^\w+$/u, {message: 'accountName is not valid'})
     @ApiProperty({
         type: String,
         example: 'tentaikhoan',
     })
-    account_name: string;
+    accountName: string;
 
     @IsString({message: 'username not found'})
     @ApiProperty({
@@ -51,5 +51,5 @@ export class RegisterDto {
         type: String,
         example: '123Beta456@',
     })
-    confirm_password: string;
+    confirmPassword: string;
 }

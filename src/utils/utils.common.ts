@@ -61,4 +61,8 @@ export class UtilCommonTemplate {
     return Array.from(uuidBytes).map(x => x.toString(16).padStart(2, '0')).join('');
   }
 
+  static generateOTP(): string {
+    return Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+  }
+
 }

@@ -8,6 +8,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { RealIpMiddleware } from "./middlewares/real-ip.middleware";
 import { AhpModule } from './ahp/ahp.module';
+import { QueueModule } from "./queue/queue.module";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AhpModule } from './ahp/ahp.module';
     AuthModule,
     UserModule,
     AhpModule,
+    QueueModule
   ]
 })
 export class AppModule implements NestModule {
