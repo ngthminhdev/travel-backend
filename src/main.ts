@@ -16,7 +16,17 @@ async function bootstrap() {
   });
 
   app.enable('trust proxy');
-  app.enableCors({origin: '*'})
+
+  app.enableCors({
+    origin: process.env.WHITELIST_IPS.split(','), // add your IP whitelist here
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true,
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization,mac',
+  });
+  // app.enableCors({origin: '*'})
+
   app.setGlobalPrefix(process.env.API_PREFIX);
   app.set('trust proxy', true);
 
@@ -54,7 +64,7 @@ async function bootstrap() {
 
   await app.listen(parseInt(process.env.SERVER_PORT)).then((): void => {
     console.log(
-      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.08`,
+      `Server is running at ${process.env.SERVER_HOST}:${process.env.SERVER_PORT} --version: 0.0.09`,
     );
   });
 }
