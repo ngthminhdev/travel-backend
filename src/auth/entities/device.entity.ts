@@ -46,6 +46,12 @@ export class DeviceEntity extends BaseModel {
     })
     ip_address: string;
 
+    @Column({
+        type: 'text',
+        default: '',
+    })
+    mac: string;
+
     @ManyToOne(() => UserEntity, (user) => user.devices)
     user: UserEntity
 }
