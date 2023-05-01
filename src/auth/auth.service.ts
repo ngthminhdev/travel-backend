@@ -69,9 +69,9 @@ export class AuthService {
       where: { account_name: data.accountName }
     });
     if (user) {
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "accountName is already registered");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Tài khoản đã được đăng ký");
     }
-    const saltOrRounds = 10;
+    const saltOrRounds: number = 10;
     const hash: string = await bcrypt.hash(data.password, saltOrRounds);
     const newUser: UserEntity = await this.userRepo.save({
       ...data,
@@ -92,16 +92,17 @@ export class AuthService {
     const { accountName, password } = loginDto;
     const user: UserEntity = await this.userRepo.findOne({ where: { account_name: accountName } });
     if (!user) {
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "accountName is not registered");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Tài khoản không tồn tại");
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "accountName or password is not correct");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Tài khoản hoặc mật khẩu không chính xác");
     }
 
     // Lấy thông tin Device ID, địa chỉ IP và User Agent
     const deviceId: string = req.deviceId;
+    const mac: string = req.headers.mac;
     const ipAddress: string = req.realIP || req.ip || req.socket.remoteAddress;
     const userAgent: string = headers["user-agent"];
 
@@ -110,7 +111,7 @@ export class AuthService {
       accessToken,
       refreshToken,
       expiredAt
-    } = await this.handleDeviceSession(user, deviceId, ipAddress, userAgent);
+    } = await this.handleDeviceSession(user, deviceId, ipAddress, userAgent, mac);
 
     // Lưu cookie refreshToken
     res.cookie("refreshToken", refreshToken, {
@@ -126,7 +127,7 @@ export class AuthService {
     });
   }
 
-  async handleDeviceSession(user: UserEntity, deviceId: string, ipAddress: string, userAgent: string): Promise<DeviceLoginInterface> {
+  async handleDeviceSession(user: UserEntity, deviceId: string, ipAddress: string, userAgent: string, mac: string): Promise<DeviceLoginInterface> {
     // Tìm kiếm thiết bị hiện tại theo device_id
     const currentDevice = await this.deviceRepo.findOne({ where: { device_id: deviceId } });
 
@@ -139,13 +140,14 @@ export class AuthService {
     const expiredAt: Date = new Date(Date.now() + TimeToLive.OneDayMilliSeconds);
 
     // Lưu thông tin của thiết bị mới vào database
-    const newDevice = await this.deviceRepo.save({
+    const newDevice: DeviceEntity = await this.deviceRepo.save({
       id: currentDevice?.id || randomUUID(),
       user: user,
       device_id: deviceId,
       user_agent: userAgent,
       expired_at: expiredAt,
       ip_address: ipAddress,
+      mac: mac,
       secret_key: secretKey,
       refresh_token: refreshToken
     });
@@ -178,7 +180,7 @@ export class AuthService {
     });
 
     await this.deviceRepo.delete({ device_id: deviceId });
-    return { status: HttpStatus.OK, message: "logged out successfully", data: null };
+    return { status: HttpStatus.OK, message: "Đăng xuất thành công", data: null };
   }
 
   async refreshToken(req: MRequest, res: Response): Promise<RefreshTokenResponse> {
@@ -186,7 +188,7 @@ export class AuthService {
     const refreshToken: string = req?.cookies?.["refreshToken"];
     if (!refreshToken) {
       // Nếu không tìm thấy refresh token trong cookies thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "refresh token not found");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lệ");
     }
     // Lấy deviceId từ request
     const deviceId: string = req.deviceId;
@@ -202,18 +204,18 @@ export class AuthService {
 
     if (!currentDevice) {
       // Nếu không tìm thấy device trong database thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "refresh token is not valid");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
     }
     // Lấy thời gian hết hạn của refreshToken
     const refreshExpired: number = (this.jwtService.decode(refreshToken))?.["exp"];
     if (refreshExpired < new Date().valueOf() / 1000) {
       // Nếu refreshToken đã hết hạn thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "refresh token is not valid");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
     }
 
     if (!this.jwtService.verify(refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET })) {
       // Nếu refreshToken không hợp lệ thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "refresh token is not valid");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
     }
 
     // Tạo secretKey mới để sử dụng cho accessToken
@@ -248,17 +250,17 @@ export class AuthService {
       .getOne();
 
     // Nếu VerifyEntity đã tồn tại, throw một ExceptionResponse với mã lỗi BAD_REQUEST
-    if (verifyEntity) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "please wait, and try again later");
+    if (verifyEntity) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Vui lòng thử lại sau ít phút");
 
     const user: UserEntity = await this.userRepo.findOne({where: { user_id: userId }})
 
-    if (!user) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "invalid request");
+    if (!user) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ");
 
     // Gửi một OTP mới đến người dùng
     await this.sendOTP(user);
 
     // Trả về một thông báo cho người dùng cho biết đã gửi thành công một OTP mới đến số điện thoại của họ
-    return "sent an OTP to your phone number";
+    return "Đã gửi mã xác thực đến số điện thoại của bạn";
   }
 
   async verifyOTP(userId: number, verifyOTP: string): Promise<string> {
@@ -270,7 +272,7 @@ export class AuthService {
       .getOne();
 
     // Nếu VerifyEntity không tồn tại, throw một ExceptionResponse với mã lỗi BAD_REQUEST
-    if (!verifyEntity) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "OTP is not valid");
+    if (!verifyEntity) throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Mã OTP không chính xác");
 
     // Xóa VerifyEntity đã được sử dụng và cập nhật is_verified của UserEntity tương ứng
     await this.verifyRepo.delete({ id: verifyEntity.id });
@@ -281,7 +283,7 @@ export class AuthService {
     if (userRedis) await this.redis.set(`${RedisKeys.User}:${userId}`, { ...userRedis, is_verified: BooleanEnum.True });
 
     // Trả về một thông báo cho người dùng cho biết tài khoản của họ đã được xác thực thành công
-    return "your account is verified successfully";
+    return "Xác minh tài khoản thành công";
   }
 
   async sendOTP(user: UserEntity): Promise<void> {
@@ -289,7 +291,7 @@ export class AuthService {
     const verifyOTP: string = UtilCommonTemplate.generateOTP();
 
     // Gửi tin nhắn SMS chứa mã OTP đến số điện thoại của người dùng (có thời hạn 5 phút)
-    await this.smsService.sendSMS(user.phone, `Your OTP is: ${verifyOTP} (5 minutes)`);
+    await this.smsService.sendSMS(user.phone, `Ma OTP travel.dangkimlien.online cua ban la : ${verifyOTP} (5 phut)`);
 
     // Lưu mã OTP vào cơ sở dữ liệu và đặt một công việc trong hàng đợi để xóa mã OTP sau 5 phút
     const verifyData: VerifyEntity = await this.verifyRepo.save({

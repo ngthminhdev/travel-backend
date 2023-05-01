@@ -43,7 +43,7 @@ export class AuthController {
     async register(@Body() body: RegisterDto, @Res() res: Response) {
         try {
             const data: RegisterResponse = await this.authService.register(body);
-            return res.status(HttpStatus.CREATED).send(new BaseResponse({ data, message: "register successfully" }));
+            return res.status(HttpStatus.CREATED).send(new BaseResponse({ data, message: "Đăng ký tài khoản thành công" }));
         } catch (e) {
             throw new CatchException(e)
         }
@@ -56,7 +56,7 @@ export class AuthController {
     async login(@Req() req: MRequest, @Body() loginDto: LoginDto, @Headers() headers: Headers, @Res() res: Response) {
         try {
             const data: UserResponse = await this.authService.login(req, loginDto, headers, res);
-            return res.status(HttpStatus.OK).send(new BaseResponse({data}));
+            return res.status(HttpStatus.OK).send(new BaseResponse({data, message: "Đăng nhập thành công"}));
         } catch (e) {
             throw new CatchException(e)
         }

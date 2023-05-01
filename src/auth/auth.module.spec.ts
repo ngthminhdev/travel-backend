@@ -17,7 +17,7 @@ import { UtilCommonTemplate } from "../utils/utils.common";
 import * as cookieParser from "cookie-parser";
 import { DeviceGuard } from "../guards/device.guard";
 import { UserResponse } from "../user/responses/user.response";
-import { RealIpMiddleware } from "../middlewares/real-ip.middleware";
+import { DeviceIdMiddleware } from "../middlewares/device-id.middleware";
 import { UnitTestModule } from "../unit-test/unit-test.module";
 
 describe("AuthModule", () => {
@@ -50,7 +50,7 @@ describe("AuthModule", () => {
         TypeOrmModule.forFeature([DeviceEntity, UserEntity])
       ],
       controllers: [AuthController],
-      providers: [AuthService, JwtService, RealIpMiddleware]
+      providers: [AuthService, JwtService, DeviceIdMiddleware]
     })
       .overrideGuard(DeviceGuard)
       .useValue(deviceGuard)

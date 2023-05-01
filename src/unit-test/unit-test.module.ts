@@ -3,7 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModuleModule } from "../config-module/config-module.module";
 import { ConfigServiceProvider } from "../config-module/config-module.service";
 import { ConfigModule } from "@nestjs/config";
-import { RealIpMiddleware } from "../middlewares/real-ip.middleware";
+import { DeviceIdMiddleware } from "../middlewares/device-id.middleware";
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { RealIpMiddleware } from "../middlewares/real-ip.middleware";
 export class UnitTestModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(RealIpMiddleware)
+      .apply(DeviceIdMiddleware)
       .forRoutes("*");
   }
 }

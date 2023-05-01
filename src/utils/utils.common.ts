@@ -41,9 +41,9 @@ export class UtilCommonTemplate {
     });
   }
 
-  static generateDeviceId(userAgent: string, ip: string): string {
+  static generateDeviceId(userAgent: string, mac: string): string {
     // Chuyển đổi chuỗi thành mảng byte
-    const arr1 = ip.split(':').map(x => parseInt(x, 16));
+    const arr1 = mac.split(':').map(x => parseInt(x, 16));
     const arr2 = new TextEncoder().encode(userAgent);
 
     // Tạo một ArrayBuffer có kích thước đủ để chứa cả hai mảng byte
