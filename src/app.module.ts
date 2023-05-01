@@ -6,9 +6,13 @@ import { ConfigServiceProvider } from "./config-module/config-module.service";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
-import { RealIpMiddleware } from "./middlewares/real-ip.middleware";
+import { DeviceIdMiddleware } from "./middlewares/device-id.middleware";
 import { AhpModule } from './ahp/ahp.module';
 import { QueueModule } from "./queue/queue.module";
+import { CityEntity } from "./models/city.entity";
+import { DistrictEntity } from "./models/district.entity";
+import { WardEntity } from "./models/ward.entity";
+import { SignVerifyMiddleware } from "./middlewares/sign-verify.middleware";
 
 @Module({
   imports: [
@@ -22,6 +26,7 @@ import { QueueModule } from "./queue/queue.module";
         config.createTypeOrmOptions(),
       inject: [ConfigServiceProvider]
     }),
+    TypeOrmModule.forFeature([CityEntity, DistrictEntity, WardEntity]),
 
     //jwt
     JwtModule.registerAsync({
@@ -50,7 +55,9 @@ import { QueueModule } from "./queue/queue.module";
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
-      .apply(RealIpMiddleware)
-      .forRoutes("*");
+      .apply(DeviceIdMiddleware)
+      .forRoutes("*")
+      // .apply(SignVerifyMiddleware)
+      // .forRoutes("*");
   }
 }
