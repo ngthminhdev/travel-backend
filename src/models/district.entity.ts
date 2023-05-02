@@ -1,13 +1,10 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
-import { BaseModel } from './base.entity';
-import { WardEntity } from "./ward.entity";
-import { CityEntity } from "./city.entity";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({
   database: 'user',
   name: 'district',
 })
-export class DistrictEntity extends BaseModel {
+export class DistrictEntity extends BaseEntity {
   @PrimaryColumn({
     type: 'int',
   })
@@ -25,11 +22,4 @@ export class DistrictEntity extends BaseModel {
     default: '',
   })
   name: string;
-
-  @ManyToOne(() => CityEntity, (city) => city.city_id)
-  city: CityEntity;
-
-  @OneToMany(() => WardEntity, (ward) => ward.ward_id)
-  wards: WardEntity[];
-
 }

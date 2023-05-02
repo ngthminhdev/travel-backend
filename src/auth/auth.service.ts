@@ -170,7 +170,7 @@ export class AuthService {
       .getOne();
 
     if (!currentSession || currentSession.user.user_id !== userId) {
-      throw new ExceptionResponse(HttpStatus.FORBIDDEN, "you are not allow to do that");
+      throw new ExceptionResponse(HttpStatus.FORBIDDEN, "Yêu cầu không hợp lệ");
     }
 
     res.cookie("refreshToken", "", {
@@ -204,18 +204,18 @@ export class AuthService {
 
     if (!currentDevice) {
       // Nếu không tìm thấy device trong database thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lệ");
     }
     // Lấy thời gian hết hạn của refreshToken
     const refreshExpired: number = (this.jwtService.decode(refreshToken))?.["exp"];
     if (refreshExpired < new Date().valueOf() / 1000) {
       // Nếu refreshToken đã hết hạn thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lệ");
     }
 
     if (!this.jwtService.verify(refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET })) {
       // Nếu refreshToken không hợp lệ thì trả về lỗi BAD_REQUEST
-      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lễ");
+      throw new ExceptionResponse(HttpStatus.BAD_REQUEST, "Refresh token không hợp lệ");
     }
 
     // Tạo secretKey mới để sử dụng cho accessToken

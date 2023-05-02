@@ -1,11 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { BaseModel } from './base.entity';
-import { DistrictEntity } from './district.entity';
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({
   name: 'city',
 })
-export class CityEntity extends BaseModel {
+export class CityEntity extends BaseEntity {
   @PrimaryColumn({
     type: 'int',
   })
@@ -23,7 +21,4 @@ export class CityEntity extends BaseModel {
     default: '',
   })
   name: string;
-
-  @OneToMany(() => DistrictEntity, (district) => district.district_id)
-  districts: DistrictEntity[];
 }

@@ -9,7 +9,7 @@ export enum TimeToLive {
     Minute = 60,
     FiveMinutes = 300,
     FiveMinutesMilliSeconds = 300000,
-    OneHour = 360,
+    OneHour = 3600,
     OneDay = 86400,
     OneYear = 31556926,
     OneDayMilliSeconds = 86400000,

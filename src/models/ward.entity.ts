@@ -1,12 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { BaseModel } from './base.entity';
-import { DistrictEntity } from './district.entity';
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({
   database: 'user',
   name: 'ward',
 })
-export class WardEntity extends BaseModel {
+export class WardEntity extends BaseEntity {
   @PrimaryColumn({
     type: 'int',
     default: 0,
@@ -24,7 +22,4 @@ export class WardEntity extends BaseModel {
     default: '',
   })
   name: string;
-
-  @ManyToOne(() => DistrictEntity, (district) => district.district_id)
-  district: DistrictEntity;
 }

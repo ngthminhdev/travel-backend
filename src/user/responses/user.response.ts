@@ -7,7 +7,7 @@ export class UserResponse {
     type: Number,
     example: 1,
   })
-  user_id: number;
+  userId: number;
 
   @ApiResponseProperty({
     type: String,
@@ -17,9 +17,9 @@ export class UserResponse {
 
   @ApiResponseProperty({
     type: String,
-    example: 'Marc Spector',
+    example: 'Đặng Kim Liên',
   })
-  name: string;
+  username: string;
 
   @ApiResponseProperty({
     type: String,
@@ -32,7 +32,7 @@ export class UserResponse {
     type: Date,
     example: '01/01/2000',
   })
-  date_of_birth: string | Date;
+  dateOfBirth: string | Date;
 
   @ApiResponseProperty({
     type: String,
@@ -44,13 +44,7 @@ export class UserResponse {
     type: Number,
     example: 0,
   })
-  is_verified: number;
-
-  @ApiResponseProperty({
-    type: Number,
-    example: 0,
-  })
-  is_receive_email: number;
+  isVerified: number;
 
   @ApiResponseProperty({
     type: Number,
@@ -69,25 +63,25 @@ export class UserResponse {
     example:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
   })
-  access_token: string;
+  accessToken: string;
 
   @ApiResponseProperty({
     type: Date
   })
-  expired_at: Date | string
+  expiredAt: Date | string
 
   constructor(data?: UserResponse | any) {
-    this.user_id = data?.user_id ?? 0;
+    this.userId = data?.user_id ?? 0;
     this.email = data?.email ?? '';
-    this.name = data?.name ?? '';
+    this.username = data?.username ?? '';
     this.avatar = data?.avatar ?? '';
-    this.date_of_birth = UtilCommonTemplate.toDateTime(data?.date_of_birth) ?? '';
+    this.dateOfBirth = UtilCommonTemplate.toDateTime(data?.date_of_birth) ?? '';
     this.phone = data?.phone ?? 0;
-    this.is_verified = data?.is_verified ?? 0;
+    this.isVerified = data?.is_verified ?? 0;
     this.role = data?.role ?? 0;
     this.address = data?.address ?? '';
-    this.access_token = data?.access_token ?? '';
-    this.expired_at = UtilCommonTemplate.toDateTime(data?.expired_at || new Date);
+    this.accessToken = data?.access_token ?? '';
+    this.expiredAt = UtilCommonTemplate.toDateTime(data?.expired_at || new Date);
   }
 
   public mapToList(data?: UserResponse[] | any[]): UserResponse[] {

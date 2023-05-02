@@ -80,7 +80,7 @@ export class AuthController {
     @ApiResponse({status: HttpStatus.OK, type: RefreshTokenSwagger})
     @ApiBearerAuth()
     @ApiCookieAuth()
-    @UseGuards(DeviceGuard)
+    // @UseGuards(DeviceGuard)
     @Post('refresh-token')
     async refreshToken(@Req() req: MRequest, @Res() res: Response) {
         try {
