@@ -12,16 +12,12 @@ export class AhpService {
   }
 
   find(query: any) {
-    const {q} = query;
+    const {q, size, price} = query;
 
     return this.db.query(`
-      SELECT * FROM bag WHERE "Title" LIKE '%${q}%'
-      UNION ALL
-      SELECT * FROM bag WHERE "Href" LIKE '%${q}%'
-      UNION ALL
-      SELECT * FROM bag WHERE "Img" LIKE '%${q}%'
-      UNION ALL
-      SELECT * FROM bag WHERE "MaSp" LIKE '%${q}%'
+      SELECT * FROM bag WHERE 
+        "Title" LIKE '%${q}%' OR "Href" LIKE '%${q}%'
+        and "KichCo" LIKE '%${size}%' and "Price" ${price}
     `)
   }
 }
