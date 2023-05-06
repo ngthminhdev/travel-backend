@@ -12,6 +12,10 @@ import { QueueModule } from "./queue/queue.module";
 import { CityEntity } from "./models/city.entity";
 import { DistrictEntity } from "./models/district.entity";
 import { WardEntity } from "./models/ward.entity";
+import { TravelModule } from './travel/travel.module';
+import { UploadModule } from "./upload/upload.module";
+import { NestjsFormDataModule } from "nestjs-form-data";
+import { AwsModule } from "./aws/aws.module";
 
 @Module({
   imports: [
@@ -48,7 +52,11 @@ import { WardEntity } from "./models/ward.entity";
     AuthModule,
     UserModule,
     AhpModule,
-    QueueModule
+    QueueModule,
+    TravelModule,
+    NestjsFormDataModule,
+    UploadModule,
+    AwsModule
   ]
 })
 export class AppModule implements NestModule {

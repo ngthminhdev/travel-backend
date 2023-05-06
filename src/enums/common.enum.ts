@@ -18,7 +18,9 @@ export enum TimeToLive {
     Forever = -1
 }
 
-export enum TransactionEnum {
-    Buy,
-    Sell
+export enum ResourceTypeEnum {
+    Image,
+    Video,
+    Audio,
+    File
 }

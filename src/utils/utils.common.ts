@@ -1,6 +1,7 @@
 import { ValidationError } from '@nestjs/common';
 import * as moment from 'moment';
 import * as crypto from "crypto";
+import slugify from "slugify";
 export class UtilCommonTemplate {
   static toDateTime(value?: any): Date | string {
     if (!value) {
@@ -63,6 +64,20 @@ export class UtilCommonTemplate {
 
   static generateOTP(): string {
     return Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+  }
+
+  static generateSlug(filename): string {
+    // Bỏ đuôi file
+    let slug = filename.split('.').slice(0, -1).join('.');
+    // Bỏ dấu tiếng Việt
+    slug = slugify(slug, {
+      lower: true,
+      remove: /[*+~.()'"!:@]/g,
+      locale: 'vi',
+    });
+    // Thay khoảng cách thành dấu -
+    slug = slug.replace(/\s+/g, '-');
+    return slug;
   }
 
 }
