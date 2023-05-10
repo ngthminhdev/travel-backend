@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { TourEntity } from './entities/tour.entity';
-import { Repository } from 'typeorm';
 import { TourResponse } from './responses/tour.response';
-import moment from 'moment';
-import { BooleanEnum } from '../enums/common.enum';
 
 @Injectable()
 export class TravelService {
@@ -58,5 +56,16 @@ export class TravelService {
     return 'Xoá tour thành công';
   }
 
-  async search(q: any) {}
+  async search(q: string) {
+    const data = await this.TourRepo.createQueryBuilder('tour')
+      .where('tour.tour_name ILike :searchTerm', {
+        searchTerm: `%${q}%`,
+      })
+      .orWhere('tour.description ILike :searchTerm2', {
+        searchTerm2: `%${q}%`,
+      })
+      .getMany();
+
+    return new TourResponse().mapToList(data);
+  }
 }

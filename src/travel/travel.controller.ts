@@ -1,22 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  HttpStatus,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TravelService } from './travel.service';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
-import { Response } from "express";
-import { CatchException } from "../exceptions/common.exception";
-import { BaseResponse } from "../utils/utils.response";
+import { Response } from 'express';
+import { CatchException } from '../exceptions/common.exception';
+import { BaseResponse } from '../utils/utils.response';
+import { AdminGuard } from '../guards/admin.guard';
 
 @Controller('travel')
 export class TravelController {
   constructor(private readonly travelService: TravelService) {}
 
+  @UseGuards(AdminGuard)
   @Post('add-tour')
   async create(@Body() createTravelDto: CreateTravelDto, @Res() res: Response) {
     try {
       const data = await this.travelService.create(createTravelDto);
-      return res.status(HttpStatus.CREATED).send(new BaseResponse({ data, message: "Thêm tour thành công" }));
+      return res
+        .status(HttpStatus.CREATED)
+        .send(new BaseResponse({ data, message: 'Thêm tour thành công' }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
@@ -26,17 +42,17 @@ export class TravelController {
       const data = await this.travelService.findAll();
       return res.status(HttpStatus.OK).send(new BaseResponse({ data }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
-  @Get('tour/:id')
+  @Get('get-tour/:id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
     try {
       const data = await this.travelService.findOne(id);
       return res.status(HttpStatus.OK).send(new BaseResponse({ data }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
@@ -46,7 +62,7 @@ export class TravelController {
       const data = await this.travelService.search(q);
       return res.status(HttpStatus.OK).send(new BaseResponse({ data }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
     }
   }
 
@@ -61,7 +77,23 @@ export class TravelController {
       const message = await this.travelService.remove(id);
       return res.status(HttpStatus.OK).send(new BaseResponse({ message }));
     } catch (e) {
-      throw new CatchException(e)
+      throw new CatchException(e);
+    }
+  }
+
+  @Post('buy-tour/:id')
+  async buyTour(
+    @Param('id') id: string,
+    @Body() createTravelDto: CreateTravelDto,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.travelService.create(createTravelDto);
+      return res
+        .status(HttpStatus.CREATED)
+        .send(new BaseResponse({ data, message: 'Thêm tour thành công' }));
+    } catch (e) {
+      throw new CatchException(e);
     }
   }
 }

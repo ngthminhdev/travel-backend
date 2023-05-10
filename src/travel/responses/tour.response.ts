@@ -1,7 +1,7 @@
-import { UtilCommonTemplate } from "../../utils/utils.common";
+import { UtilCommonTemplate } from '../../utils/utils.common';
 
 export class TourResponse {
-  id: string
+  id: string;
   tourName: string;
   description: string;
   startPlace: string;
@@ -13,9 +13,9 @@ export class TourResponse {
   following: number;
   image: string;
   address: string;
-  isHotel: number;
-  isCar: number;
-  isAirplane: number;
+  isHotel: boolean;
+  isCar: boolean;
+  isAirplane: boolean;
 
   constructor(data?: any) {
     this.id = data?.travel_id || '';
@@ -30,12 +30,12 @@ export class TourResponse {
     this.discount = data?.discount || 0;
     this.rating = data?.rating || 0;
     this.following = data?.following || 0;
-    this.isHotel = data?.is_hotel || 0;
-    this.isCar = data?.is_car || 0;
-    this.isAirplane = data?.is_airplane || 0;
+    this.isHotel = data?.is_hotel || false;
+    this.isCar = data?.is_car || false;
+    this.isAirplane = data?.is_airplane || false;
   }
 
   public mapToList(data?: any[]) {
-    return data.map(item => new TourResponse(item))
+    return data.map((item) => new TourResponse(item));
   }
 }
