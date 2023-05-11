@@ -1,19 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Like, Repository } from 'typeorm';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { UpdateTravelDto } from './dto/update-travel.dto';
 import { TourEntity } from './entities/tour.entity';
 import { TourResponse } from './responses/tour.response';
+import { BuyTourDto } from './dto/buy-tour.dto';
+import { BuyTourEntity } from './entities/buy-tour.entity';
+import { ExceptionResponse } from '../exceptions/common.exception';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Injectable()
 export class TravelService {
   constructor(
     @InjectRepository(TourEntity)
-    private readonly TourRepo: Repository<TourEntity>,
+    private readonly tourRepo: Repository<TourEntity>,
+    @InjectRepository(BuyTourEntity)
+    private readonly buyTourRepo: Repository<BuyTourEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
+    @InjectDataSource()
+    private readonly db: DataSource,
   ) {}
   async create(data: CreateTravelDto) {
-    const tour: TourEntity = await this.TourRepo.save({
+    const tour: TourEntity = await this.tourRepo.save({
       tour_name: data.tourName,
       description: data.description,
       address: data.address,
@@ -32,7 +42,7 @@ export class TravelService {
   }
 
   async findAll() {
-    const data = await this.TourRepo.find({
+    const data = await this.tourRepo.find({
       where: { is_deleted: false },
       order: { created_at: 'DESC' },
     });
@@ -40,7 +50,7 @@ export class TravelService {
   }
 
   async findOne(id: string) {
-    const data = await this.TourRepo.findOne({ where: { travel_id: id } });
+    const data = await this.tourRepo.findOne({ where: { travel_id: id } });
     return new TourResponse(data);
   }
 
@@ -49,7 +59,7 @@ export class TravelService {
   }
 
   async remove(id: string) {
-    await this.TourRepo.update(
+    await this.tourRepo.update(
       { travel_id: id },
       { deleted_at: new Date(), is_deleted: true },
     );
@@ -57,15 +67,59 @@ export class TravelService {
   }
 
   async search(q: string) {
-    const data = await this.TourRepo.createQueryBuilder('tour')
-      .where('tour.tour_name ILike :searchTerm', {
-        searchTerm: `%${q}%`,
-      })
-      .orWhere('tour.description ILike :searchTerm2', {
-        searchTerm2: `%${q}%`,
-      })
-      .getMany();
+    const query: string = `
+      SELECT * FROM tour WHERE
+      to_tsvector('vietnamese', tour_name || ' ' || description) @@ to_tsquery('vietnamese', '${q
+        .split(' ')
+        .join(' | ')}') and is_deleted = false;
+    `;
+
+    const data = await this.db.query(query);
 
     return new TourResponse().mapToList(data);
+  }
+
+  async buyTour(tourId: string, data: BuyTourDto, userId: number) {
+    const buyTour: BuyTourEntity = await this.buyTourRepo.findOneBy({
+      tour: { travel_id: tourId },
+    });
+
+    if (buyTour) {
+      throw new ExceptionResponse(
+        HttpStatus.BAD_REQUEST,
+        'Bạn đã đặt tour này rồi, chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất',
+      );
+    }
+
+    const newBuyTour: BuyTourEntity = this.buyTourRepo.create({
+      total_payment: data.totalPayment,
+    });
+
+    const user: UserEntity = await this.userRepo.findOneBy({ user_id: userId });
+
+    if (!user) {
+      throw new ExceptionResponse(
+        HttpStatus.BAD_REQUEST,
+        'Không tìm thấy người dùng',
+      );
+    }
+
+    const tour: TourEntity = await this.tourRepo.findOneBy({
+      travel_id: tourId,
+    });
+
+    if (!tour) {
+      throw new ExceptionResponse(
+        HttpStatus.BAD_REQUEST,
+        'Không tìm thấy tour',
+      );
+    }
+
+    newBuyTour.user = user;
+    newBuyTour.tour = tour;
+
+    await newBuyTour.save();
+
+    return true;
   }
 }

@@ -18,6 +18,9 @@ import { Response } from 'express';
 import { CatchException } from '../exceptions/common.exception';
 import { BaseResponse } from '../utils/utils.response';
 import { AdminGuard } from '../guards/admin.guard';
+import { AuthGuard } from '../guards/auth.guard';
+import { BuyTourDto } from './dto/buy-tour.dto';
+import { GetUserIdFromToken } from '../utils/utils.decorators';
 
 @Controller('travel')
 export class TravelController {
@@ -71,6 +74,7 @@ export class TravelController {
     return this.travelService.update(+id, updateTravelDto);
   }
 
+  @UseGuards(AdminGuard)
   @Delete('remove/:id')
   async remove(@Param('id') id: string, @Res() res: Response) {
     try {
@@ -81,17 +85,19 @@ export class TravelController {
     }
   }
 
-  @Post('buy-tour/:id')
+  @UseGuards(AuthGuard)
+  @Post('order-tour/:tourId')
   async buyTour(
-    @Param('id') id: string,
-    @Body() createTravelDto: CreateTravelDto,
+    @Param('tourId') tourId: string,
+    @Body() buyTourDto: BuyTourDto,
+    @GetUserIdFromToken() userId: number,
     @Res() res: Response,
   ) {
     try {
-      const data = await this.travelService.create(createTravelDto);
+      const data = await this.travelService.buyTour(tourId, buyTourDto, userId);
       return res
         .status(HttpStatus.CREATED)
-        .send(new BaseResponse({ data, message: 'Thêm tour thành công' }));
+        .send(new BaseResponse({ data, message: 'Đặt chỗ thành công' }));
     } catch (e) {
       throw new CatchException(e);
     }

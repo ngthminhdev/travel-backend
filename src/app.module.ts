@@ -16,6 +16,7 @@ import { TravelModule } from './travel/travel.module';
 import { UploadModule } from "./upload/upload.module";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { AwsModule } from "./aws/aws.module";
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -56,7 +57,8 @@ import { AwsModule } from "./aws/aws.module";
     TravelModule,
     NestjsFormDataModule,
     UploadModule,
-    AwsModule
+    AwsModule,
+    AdminModule
   ]
 })
 export class AppModule implements NestModule {
