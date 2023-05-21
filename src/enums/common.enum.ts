@@ -26,8 +26,10 @@ export enum ResourceTypeEnum {
 }
 
 export enum TourStatusTypeEnum {
-  Ordered,
-  Completed,
-  Done,
-  Cancled,
+  All = -1,
+  Ordered = 0,
+  Paymented = 1,
+  Confirmed = 2,
+  Done = 3,
+  Canceled = 4,
 }

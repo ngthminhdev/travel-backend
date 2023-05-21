@@ -1,5 +1,7 @@
+import { CommentEntity } from '../../feedback/entities/comment.entity';
+import { RatingEntity } from '../../feedback/entities/rating.entity';
 import { BaseModel } from '../../models/base.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({
   name: 'tour',
@@ -54,6 +56,12 @@ export class TourEntity extends BaseModel {
   rating: number;
 
   @Column({
+    type: 'float',
+    default: 0,
+  })
+  number_of_rating: number;
+
+  @Column({
     type: 'int',
     default: 0,
   })
@@ -101,6 +109,6 @@ export class TourEntity extends BaseModel {
   })
   deleted_at: Date | string;
 
-  // @Column('tsvector', { select: false, default: '' })
-  // searchVector: string;
+  @OneToMany(() => CommentEntity, (comment) => comment.comment_id)
+  comments: CommentEntity[];
 }

@@ -6,21 +6,24 @@ import { UpdateTravelDto } from './dto/update-travel.dto';
 import { TourEntity } from './entities/tour.entity';
 import { TourResponse } from './responses/tour.response';
 import { BuyTourDto } from './dto/buy-tour.dto';
-import { BuyTourEntity } from './entities/buy-tour.entity';
 import { ExceptionResponse } from '../exceptions/common.exception';
 import { UserEntity } from '../user/entities/user.entity';
+import { OrderTourEntity } from './entities/order-tour.entity';
+import { TourStatusTypeEnum } from '../enums/common.enum';
+import { SmsService } from '../sms/sms.service';
 
 @Injectable()
 export class TravelService {
   constructor(
     @InjectRepository(TourEntity)
     private readonly tourRepo: Repository<TourEntity>,
-    @InjectRepository(BuyTourEntity)
-    private readonly buyTourRepo: Repository<BuyTourEntity>,
+    @InjectRepository(OrderTourEntity)
+    private readonly orderTourRepo: Repository<OrderTourEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
     @InjectDataSource()
     private readonly db: DataSource,
+    private readonly smsService: SmsService,
   ) {}
   async create(data: CreateTravelDto) {
     const tour: TourEntity = await this.tourRepo.save({
@@ -38,7 +41,7 @@ export class TravelService {
       start_time: data.startTime,
     });
 
-    return tour;
+    return new TourResponse(tour);
   }
 
   async findAll() {
@@ -80,18 +83,18 @@ export class TravelService {
   }
 
   async buyTour(tourId: string, data: BuyTourDto, userId: number) {
-    const buyTour: BuyTourEntity = await this.buyTourRepo.findOneBy({
+    const orderTour: OrderTourEntity = await this.orderTourRepo.findOneBy({
       tour: { travel_id: tourId },
     });
 
-    if (buyTour) {
+    if (orderTour) {
       throw new ExceptionResponse(
         HttpStatus.BAD_REQUEST,
-        'Bạn đã đặt tour này rồi, chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất',
+        'Lỗi!!! Bạn đã đặt tour trước đó. Không thể đặt đơn lần 2',
       );
     }
 
-    const newBuyTour: BuyTourEntity = this.buyTourRepo.create({
+    const newOrderTour: OrderTourEntity = this.orderTourRepo.create({
       total_payment: data.totalPayment,
     });
 
@@ -115,10 +118,50 @@ export class TravelService {
       );
     }
 
-    newBuyTour.user = user;
-    newBuyTour.tour = tour;
+    newOrderTour.user = user;
+    newOrderTour.tour = tour;
 
-    await newBuyTour.save();
+    await this.orderTourRepo.save(newOrderTour);
+
+    return true;
+  }
+
+  async makePayment(tourId: string, userId: number) {
+    const orderTour = await this.orderTourRepo.findOne({
+      where: {
+        tour: { travel_id: tourId },
+        user: { user_id: userId },
+      },
+      relations: ['user', 'tour'],
+    });
+
+    if (orderTour.user.user_id !== userId) {
+      throw new ExceptionResponse(
+        HttpStatus.BAD_REQUEST,
+        'Yêu cầu không hợp lệ',
+      );
+    }
+
+    if (!orderTour) {
+      throw new ExceptionResponse(
+        HttpStatus.BAD_REQUEST,
+        'Không tìm thấy đơn hàng',
+      );
+    }
+
+    await this.orderTourRepo.update(
+      { order_tour_id: orderTour.order_tour_id },
+      {
+        status: TourStatusTypeEnum.Paymented,
+      },
+    );
+    const tourIdSMS: string = orderTour.tour.travel_id;
+    const userPhone: string = orderTour.user.phone;
+
+    await this.smsService.sendSMS(
+      userPhone,
+      `Quy khach vua thuc hien thanh toan tour ${tourIdSMS}. Cam on ban da chon dich vu KhanhhoaTravel. Chung toi se lien he ban trong thoi gian som nhat. Xin cam on`,
+    );
 
     return true;
   }

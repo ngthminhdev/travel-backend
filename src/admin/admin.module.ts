@@ -3,11 +3,13 @@ import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TourEntity } from '../travel/entities/tour.entity';
-import { BuyTourEntity } from '../travel/entities/buy-tour.entity';
+import { OrderTourEntity } from '../travel/entities/order-tour.entity';
 import { UserEntity } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TourEntity, BuyTourEntity, UserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([TourEntity, OrderTourEntity, UserEntity]),
+  ],
   controllers: [AdminController],
   providers: [AdminService],
 })

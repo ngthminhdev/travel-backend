@@ -10,6 +10,7 @@ export class TourResponse {
   price: number;
   discount: number;
   rating: number;
+  numberOfRating: number;
   following: number;
   image: string;
   address: string;
@@ -28,7 +29,8 @@ export class TourResponse {
     this.quantity = data?.quantity || 0;
     this.price = data?.price || 0;
     this.discount = data?.discount || 0;
-    this.rating = data?.rating || 0;
+    this.rating = +(data?.rating / data?.number_of_rating).toFixed(1) || 0;
+    this.numberOfRating = data?.number_of_rating || 0;
     this.following = data?.following || 0;
     this.isHotel = data?.is_hotel || false;
     this.isCar = data?.is_car || false;

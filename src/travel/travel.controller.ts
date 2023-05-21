@@ -21,7 +21,9 @@ import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 import { BuyTourDto } from './dto/buy-tour.dto';
 import { GetUserIdFromToken } from '../utils/utils.decorators';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Tour - API')
 @Controller('travel')
 export class TravelController {
   constructor(private readonly travelService: TravelService) {}
@@ -97,7 +99,24 @@ export class TravelController {
       const data = await this.travelService.buyTour(tourId, buyTourDto, userId);
       return res
         .status(HttpStatus.CREATED)
-        .send(new BaseResponse({ data, message: 'Đặt chỗ thành công' }));
+        .send(new BaseResponse({ data, message: 'Đặt tour thành công' }));
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('payment-tour/:tourId')
+  async makePayment(
+    @Param('tourId') tourId: string,
+    @GetUserIdFromToken() userId: number,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.travelService.makePayment(tourId, userId);
+      return res
+        .status(HttpStatus.OK)
+        .send(new BaseResponse({ data, message: 'Thanh toán thành công' }));
     } catch (e) {
       throw new CatchException(e);
     }
