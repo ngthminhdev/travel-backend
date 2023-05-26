@@ -9,6 +9,7 @@ import { TourStatusTypeEnum } from '../enums/common.enum';
 import { OrderTourEntity } from '../travel/entities/order-tour.entity';
 import { UserResponse } from '../user/responses/user.response';
 import { OrderTourResponse } from './responses/order-tour.response';
+import { DeviceEntity } from '../auth/entities/device.entity';
 
 @Injectable()
 export class AdminService {
@@ -19,6 +20,8 @@ export class AdminService {
     private readonly orderTourRepo: Repository<OrderTourEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(DeviceEntity)
+    private readonly deviceRepo: Repository<DeviceEntity>,
     @InjectDataSource()
     private readonly db: DataSource,
   ) {}
@@ -59,6 +62,18 @@ export class AdminService {
       { status: status },
     );
 
+    return true;
+  }
+
+  async removeUser(userId: number) {
+    await this.deviceRepo.delete({ user: { user_id: userId } });
+    await this.userRepo.delete({ user_id: userId });
+
+    return true;
+  }
+
+  async updateUser(userId: number, body: any) {
+    await this.userRepo.update({ user_id: userId }, { ...body });
     return true;
   }
 }

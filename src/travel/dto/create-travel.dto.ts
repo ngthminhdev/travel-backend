@@ -7,10 +7,6 @@ export class CreateTravelDto {
   @IsString()
   description: string;
 
-  @IsString()
-  address: string;
-
-  @IsString()
   image: string;
 
   @IsString()

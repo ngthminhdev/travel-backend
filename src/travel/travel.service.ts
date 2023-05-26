@@ -29,7 +29,6 @@ export class TravelService {
     const tour: TourEntity = await this.tourRepo.save({
       tour_name: data.tourName,
       description: data.description,
-      address: data.address,
       image: data.image,
       price: data.price,
       discount: data.discount,

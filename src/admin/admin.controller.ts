@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -56,6 +57,40 @@ export class AdminController {
         new BaseResponse({
           data,
           message: 'Cập nhật trạng thái tour thành công',
+        }),
+      );
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  @Delete('remove/:userId')
+  async removeUser(@Param('userId') userId: string, @Res() res: Response) {
+    try {
+      const data = await this.adminService.removeUser(parseInt(userId));
+      return res.status(HttpStatus.OK).send(
+        new BaseResponse({
+          data,
+          message: 'Xoá user thành công',
+        }),
+      );
+    } catch (e) {
+      throw new CatchException(e);
+    }
+  }
+
+  @Post('update/:userId')
+  async updateUser(
+    @Param('userId') userId: string,
+    @Body() body: any,
+    @Res() res: Response,
+  ) {
+    try {
+      const data = await this.adminService.updateUser(parseInt(userId), body);
+      return res.status(HttpStatus.OK).send(
+        new BaseResponse({
+          data,
+          message: 'Cập nhật user thành công',
         }),
       );
     } catch (e) {

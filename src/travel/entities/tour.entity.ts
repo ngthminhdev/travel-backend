@@ -75,11 +75,6 @@ export class TourEntity extends BaseModel {
   image: string;
 
   @Column({
-    type: 'text',
-  })
-  address: string;
-
-  @Column({
     type: 'boolean',
     default: false,
   })
